@@ -1,0 +1,9 @@
+.ubuntu-mono-regular {
+  font-family: "Ubuntu Mono", monospace;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.hint {
+  color: #b600e4;
+}

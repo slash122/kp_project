@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <!-- <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" /> -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="static/script.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        <title>Memory game! (ARDUINO KP Project)</title>
+    </head>
+    <body class="p-0 m-0 h-screen ">
+        <div class="flex" style="width: 100%; height: 100%">
+            <!-- First Column (2 Rows) -->
+            <div style="width: 50%; height: 100%">
+                <div class="flex w-full h-1/2">
+                    <!-- SEQUENCE INDICATOR SECTION -->
+                    <div class="rounded border-2 border-blue-500 m-4 p-4  w-1/2 flex flex-col gap-4">
+                        <div class="h-12 border-b border-b border-black">
+                            <h1 class="text-black text-3xl">Sequence indicator</h1>
+                        </div>
+                        <div class="flex-1 relative">
+                            <img id="seq-indicator-img" src="static/images/rgb.png" alt="RGB Image" class="absolute inset-0 w-full h-full">
+                            <canvas id="seq-indicator-canvas" class="absolute inset-0"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- USER INPUT SECTION-->
+                    <div class="rounded border-2 border-blue-500 mt-4 mb-4 p-4 w-1/2 flex flex-col gap-4">
+                        <div class="h-12 border-b border-b border-black">
+                            <h1 class="text-black text-3xl">User inputs</h1>
+                        </div>
+                        <div class="flex-1 relative">
+                            <img id="user-inputs-img" src="static/images/diodes.png" alt="DIODES Image" class="absolute inset-0 w-full h-full object-contain">
+                            <canvas id="user-inputs-canvas" class="absolute inset-0"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex w-full h-1/2">
+                    <div class="rounded border-2 border-red-500 bg-red-100 mb-4 mr-4 ml-4 p-4 w-1/2 flex flex-col">
+                        <div class="h-12 border-b border-b border-black mb-4">
+                            <h1 class="text-black text-3xl">Settings</h1>
+                        </div>
+                        <div class="flex-1">
+                            <div class="mb-4">
+                                <label for="difficulty">Difficulty:</label>
+                                <select id="difficulty" name="difficulty" class="w-full rounded border-1 border-black" style="border: 1px solid black;">
+                                    <option value="500">Easy</option>
+                                    <option value="300">Medium</option>
+                                    <option value="100">Hard</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="gamemode">Gamemode:</label>
+                                <select id="gamemode" name="gamemode" class="w-full rounded" style="border: 1px solid black;">
+                                    <option value="0">Sequential random</option>
+                                    <option value="1">Full random</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <button onclick="sendSettings()" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                Send to Arduino
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="rounded border-2 border-black border-red-500 bg-red-100 mb-4 p-4 w-1/2 flex flex-col">
+                        <div class="h-12 border-b mb-4 border-black">
+                            <h1 class="text-black text-3xl">Controls</h1>
+                        </div>
+                        <div class="flex-1 gap-4" style="height: auto; display: flex; flex-direction: column; align-items: stretch; align-content: stretch; justify-content: space-around;">
+                            <div style="flex-grow: 2; align-self: auto;"> 
+                                <button onclick="sendControlMessage('START')" class="text-6xl h-full w-full bg-green-600 hover:bg-green-700 text-white font-bold rounded">
+                                    START
+                                </button>
+                            </div>
+                            <div style="flex-grow: 2; align-self: auto;">
+                                <button onclick="sendControlMessage('STOP')" class="text-6xl h-full w-full bg-red-500 hover:bg-red-700 text-white font-bold rounded">
+                                    STOP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Second Column (1 Row) -->
+            <div class="flex flex-col" style="width: 50%; height: 100%;">
+                <div class="rounded border-2 border-green-500 m-4 flex flex-col p-4 bg-green-100" style="height: 30%;">
+                    <h1 class="text-3xl h-12 border-b border-black" >Info</h1>
+                    <h2 class="text-xl mt-4">KP Project <strong>"Memory trainer"</strong></h2> by Daria Haidukevich and Glib Avrutin
+                    <p class="mt-auto">Kraków, AGH, WFiIS, 2024</p>
+                </div>
+                <div class="mb-4 mr-4 ml-4 flex flex-col p-4 rounded border-2 border-purple-500 bg-purple-100 flex flex-col" style="height: 70%;">
+                    <h1 class="mb-4 text-3xl h-12 border-b border-black" >Logs</h1>
+                    <div class="flex-1 gap-4" style="height: auto; display: flex; flex-direction: column; align-items: stretch; align-content: stretch; justify-content: space-around;">
+                        <div style="flex-grow: 2; align-self: auto;"> 
+                            <div id="log-div" class="bg-black text-white ubuntu-mono-regular" style="overflow-y: scroll; height: 330px;">
+                            </div>
+                        </div>
+                        <style>
+                            .ubuntu-mono-regular {
+                                font-family: "Ubuntu Mono", monospace;
+                                font-weight: 400;
+                                font-style: normal;
+                            }
+                            
+                            .hint {
+                               color: rgb(255, 160, 255) 
+                            }
+                        </style>
+                        <div style="align-self: auto;">
+                            <span>
+                                <button onclick="refreshLog()">Refresh</button>
+                                <button onclick="showOrHideHints()">Hints</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
